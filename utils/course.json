@@ -1,0 +1,11 @@
+{
+    "id":1,
+    "titre": "Apprendre Django",
+    "updated": "2023-10-01",
+    "duration": "8h",
+    "difficulty": "Beginner",
+    "videos": [1,2,3],
+    "detail": "Ce cours couvre les bases de Django, un framework Python pour le développement web.",
+    "description": "Dans ce cours, vous apprendrez à installer Django, créer votre première application et comprendre pourquoi Django est un choix populaire pour les développeurs web.",
+    "image": "https://example.com/image.jpg"
+  }
