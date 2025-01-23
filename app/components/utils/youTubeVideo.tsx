@@ -10,7 +10,6 @@ interface YouTubeVideoProps {
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({
   videoId, isPortrait
 }) => {
-  console.log("Isportttttt",isPortrait)
   return (
     <View style={isPortrait ? styles.container : styles.noPortraitContainer}>
       <WebView

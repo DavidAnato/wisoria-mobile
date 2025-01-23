@@ -47,7 +47,6 @@ const CourseDetail = ({ route }: { route: any }) => {
         navigation.navigate('Course', { courseId });
       }
     } catch (err: any) {
-      console.log(err.response.data);
       if (err.response.data.already_subscribed) {
         ToastAndroid.show('Vous êtes déjà inscrit à ce cours', ToastAndroid.SHORT);
         navigation.navigate('Course', { courseId });
@@ -90,7 +89,7 @@ const CourseDetail = ({ route }: { route: any }) => {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         <HtmlRender description={courseData.description} />
       </ScrollView>
-      {enrolledUser && enrolledUser.status === 'in_progress' && (
+      {enrolledUser && enrolledUser.status !== 'completed' && (
         <TouchableOpacity 
             style={styles.button} 
             onPress={() => navigation.navigate('Course', { courseId })} 

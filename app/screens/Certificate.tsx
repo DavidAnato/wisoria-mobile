@@ -30,8 +30,7 @@ const Certificate = ({ route }: { route: any }) => {
                     ToastAndroid.show('Le certificat n\'est pas disponible.', ToastAndroid.SHORT);
                 }
             } catch (error) {
-                console.error('Erreur de téléchargement du certificat:', error);
-                ToastAndroid.show('Une erreur est survenue lors du téléchargement.', ToastAndroid.SHORT);
+                ToastAndroid.show('Erreur de téléchargement du certificat.', ToastAndroid.SHORT);
             }
         };
 

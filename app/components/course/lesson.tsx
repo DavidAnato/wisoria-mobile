@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 import { Ionicons } from '@expo/vector-icons';
 import { apiRequest } from '../../../utils/api';
-
 interface LessonProps {
   id: number;
   onCompleted: () => void;
@@ -25,7 +24,15 @@ const Lesson: React.FC<LessonProps> = ({ id, onCompleted, onVideoIdChange }) => 
   const [completed, setCompleted] = useState<boolean>(false);
   const screenWidth = Dimensions.get('window').width;
 
+  // Utilisation de useRef pour stocker l'ID de la leçon précédente
+  const prevIdRef = useRef<number | null>(null);
+
   useEffect(() => {
+    // Vérifie si l'ID a changé par rapport à la dernière fois
+    if (id === prevIdRef.current) {
+      return; // Ne pas faire la requête si l'ID est le même
+    }
+
     const fetchLesson = async () => {
       setLoading(true);
       try {
@@ -37,13 +44,15 @@ const Lesson: React.FC<LessonProps> = ({ id, onCompleted, onVideoIdChange }) => 
 
         // Appelez le callback avec l'ID de la vidéo une fois les données récupérées
         if (lessonData.video_id) {
-          console.log(lessonData.video_id)
           onVideoIdChange(lessonData.video_id);
         }
 
         if (lessonData.completed) {
           onCompleted();
         }
+
+        // Mettre à jour l'ID précédent
+        prevIdRef.current = id;
       } catch (err) {
         setError('Failed to load lesson');
       } finally {
@@ -114,6 +123,7 @@ const Lesson: React.FC<LessonProps> = ({ id, onCompleted, onVideoIdChange }) => 
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

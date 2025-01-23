@@ -40,7 +40,6 @@ const Login = () => {
       ToastAndroid.show(`Welcome back ${data.user.first_name}!`, ToastAndroid.SHORT);
       navigation.navigate("Home" as never);
     } catch (error: any) {
-      console.log(error.response.data.non_field_errors);
       for (const _ of error.response.data.non_field_errors) {
         ToastAndroid.show(_, ToastAndroid.SHORT);
       }

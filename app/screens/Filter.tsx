@@ -9,7 +9,6 @@ import Background from "../components/utils/background";
 const Filter = ({ route }: { route: any }) => {
   const { category } = route.params;
   const [tab, setTab] = useState<string>("courses");
-  console.log(category);
 
   const handleChangeTab = (tab: string) => {
     setTab(tab);

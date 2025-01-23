@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 40, // Set top-left radius to 24px
     borderTopRightRadius: 40, // Set top-right radius to 24px
     paddingVertical: 10,
-
     zIndex: 1,
     position: 'absolute',
     bottom: 0,

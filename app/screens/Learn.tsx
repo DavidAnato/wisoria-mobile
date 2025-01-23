@@ -24,7 +24,6 @@ const Learn = () => {
         setLoading(false);
       }
     };
-    console.log('courses ////////////////',JSON.stringify(courses, null, 2));
     fetchPathways();
   }, []);
 
@@ -74,7 +73,7 @@ const Learn = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    marginBottom: 100,
+    paddingBottom: 100,
   },
   title: {
     fontSize: 20,

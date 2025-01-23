@@ -5,11 +5,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  ToastAndroid,
 } from "react-native";
 import { apiRequest } from "../../utils/api";
 import { useNavigation } from "@react-navigation/native";
-import Header from "../components/utils/header";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import CoursesHeader from "../components/utils/coursesHeader";
+import LessonsDrawer from "../components/course/lessonsDrawer";
 
 const Quiz = ({ route }: { route: any }) => {
   const { quizId, currentChapterId, courseId } = route.params;
@@ -20,6 +22,7 @@ const Quiz = ({ route }: { route: any }) => {
   const [quizGlobalStatus, setQuizGlobalStatus] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
 
   useEffect(() => {
     initializeQuiz();
@@ -100,7 +103,7 @@ const Quiz = ({ route }: { route: any }) => {
         result: response.data.result,
       });
     } catch (err: any) {
-      console.error(err);
+      ToastAndroid.show("Erreur lors de la soumission.", ToastAndroid.SHORT)
       setError(err.response?.data || "Erreur lors de la soumission.");
     }
   };
@@ -123,7 +126,10 @@ const Quiz = ({ route }: { route: any }) => {
 
   return (
     <>
-      <Header title="Quiz" backEnabled={true} />
+      { isSideBarOpen && (
+        <LessonsDrawer onClose={() => {setIsSideBarOpen(false)}} courseId={courseId} />
+      )}
+      <CoursesHeader title="Quiz" backEnabled={true} onMenuPress={() => {setIsSideBarOpen(true)}} />
       <ScrollView style={styles.container}>
         <Text style={styles.title}>{quiz.title}</Text>
         <Text style={styles.description}>{quiz.description}</Text>

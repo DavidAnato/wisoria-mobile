@@ -6,25 +6,9 @@ import Background from '../utils/background';
 import Header from '../utils/header';
 import { Course as CourseData, Chapter as ChapterData } from '../../../utils/types';
 import { apiRequest } from '../../../utils/api';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import YouTubeVideo from '../utils/youTubeVideo';
-import * as ScreenOrientation from 'expo-screen-orientation';
-
-const lockPortrait = async () => {
-  await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-};
-
-// Fonction pour verrouiller en mode paysage
-const lockLandscape = async () => {
-  await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-};
-
-// Fonction pour permettre toutes les orientations
-const unlockOrientation = async () => {
-  await ScreenOrientation.unlockAsync();
-};
-
 
 interface CourseProps {
   courseId: number;
@@ -108,28 +92,7 @@ const Course: React.FC<CourseProps> = ({ courseId, currentChapterId }) => {
       });
       setCompletedLesson(true);
     } catch (err: any) {
-      console.error('Failed to mark lesson as completed: ', err);
-      console.log(err.response.data)
-    }
-  };
-
-  const resetLesson = async (lessonId: number) => {
-    try {
-      await apiRequest({
-        method: 'DELETE',
-        url: 'learning/user/lesson/restart/',
-        data: { lesson_id: lessonId },
-      });
-      setCompletedLesson(false);
-    } catch (err) {
-      console.error('Failed to reset lesson: ', err);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex < lessonIds.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setCompletedLesson(false); // Reset completion status when moving to the next lesson
+      ToastAndroid.show('Failed to mark lesson as completed: ', ToastAndroid.SHORT);
     }
   };
 
@@ -139,9 +102,42 @@ const Course: React.FC<CourseProps> = ({ courseId, currentChapterId }) => {
       setCompletedLesson(true); // Reset completion status when moving to the previous lesson
     }
   };
-
+  
+  const handleNext = async (lessonId: number) => {
+    try {
+      await markAsCompleted(lessonId); // Attendez la fin de l'appel avant de continuer
+      if (currentIndex < lessonIds.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setCompletedLesson(false); // Réinitialisez le statut de complétion
+      }
+    } catch (error) {
+      ToastAndroid.show('Failed to move to the next lesson', ToastAndroid.SHORT);
+    }
+  };
+  
+  const handleGoToQuiz = async (lessonId: number) => {
+    try {
+      await markAsCompleted(lessonId); // Attendez la fin de l'appel
+      navigation.navigate('Quiz', {
+        quizId,
+        currentChapterId: currentChapterIdState,
+        courseId,
+      });
+    } catch (error) {
+      ToastAndroid.show('Failed to mark lesson as completed before quiz', ToastAndroid.SHORT);
+    }
+  };
+  
+  const handleGetCertificate = async (lessonId: number) => {
+    try {
+      await markAsCompleted(lessonId); // Attendez la fin de l'appel
+      navigation.navigate('Certificate', { courseId });
+    } catch (error) {
+      ToastAndroid.show('Failed to mark lesson as completed before certificate', ToastAndroid.SHORT);
+    }
+  };
+  
   const handleSetVideoId = (newVideoId:string) => {
-    console.log("new",newVideoId)
     if (videoId !== newVideoId) {
       setVideoId(newVideoId)
     }
@@ -212,64 +208,34 @@ const Course: React.FC<CourseProps> = ({ courseId, currentChapterId }) => {
             <Text style={styles.buttonText}>Précédent</Text>
           </TouchableOpacity>
         )}
-        {completedLesson ? (
-        <TouchableOpacity 
-        style={[styles.button, styles.restartButton]} 
-        onPress={() => {
-          resetLesson(lessonId);
-        }}
-      >
-        <Ionicons name="refresh" size={30} color="white" />
-        {/* <Text style={styles.buttonText}>Recommencer</Text> */}
-      </TouchableOpacity>
-
-        ) : (
-          <TouchableOpacity 
-            style={[styles.button, styles.finishButton]} 
-            onPress={() => {
-              markAsCompleted(lessonId);
-            }}
-          >
-            <Ionicons name="checkmark-done-sharp" size={24} color="white" />
-            <Text style={styles.buttonText}>Terminer</Text>
-          </TouchableOpacity>
-        )}
 
         {isLast && !isLastChapter ? (
           <TouchableOpacity
           style={[styles.button, styles.quizButton]}
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('Quiz', { quizId, currentChapterId: currentChapterIdState, courseId })}
+          onPress={() => handleGoToQuiz(lessonId)}
           >
             <Text style={styles.buttonText}>Quizz</Text>
             <MaterialIcons name="quiz" size={24} color="white" />
           </TouchableOpacity>
-        ) : isLastChapter && everyLessonCompleted ? (
+        ) : isLastChapter ? (
           <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigation.navigate('Certificate', { courseId })}
+          onPress={() => handleGetCertificate(lessonId)}
         >
-          <Text style={styles.buttonText}>Obtenir le certificat</Text>
-          <Ionicons name="document-text" size={24} color="white" />
-        </TouchableOpacity>
-
-        ) : isLastChapter && !everyLessonCompleted ? (
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => navigation.navigate('Certificate', { courseId })}
-          >
-            <Text style={styles.buttonText}>Exemple de certificat</Text>
-            <Ionicons name="document-text" size={24} color="white" />
+          <Text style={[styles.buttonText, {flex:1}]}>Obtenir le certificat</Text>
+          <MaterialCommunityIcons name="certificate" size={24} color="white" />
           </TouchableOpacity>
+
         ) : 
         <TouchableOpacity 
-          style={styles.button} 
-          onPress={handleNext}
+          style={[styles.button, {backgroundColor:'#0056D2'}]} 
+          onPress={() => handleNext(lessonId)}
         >
           <Text style={styles.buttonText}>Suivant</Text>
           <Ionicons name="arrow-forward" size={24} color="white" />
         </TouchableOpacity>
-}
+        }
       </View>}
     </>
   );

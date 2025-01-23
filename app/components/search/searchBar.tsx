@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, ToastAndroid } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import RoundedTopContainer from "../utils/custumFormSheet";
@@ -28,7 +28,7 @@ const SearchBar = ({ onSearch }: { onSearch: (query: string, category: string | 
       });
         setCategoryList(res.data.map((category: any) => category.name));
       } catch (err) {
-        console.log(err);
+        ToastAndroid.show("Une erreur s'est produite", ToastAndroid.SHORT)
       }
     };
     fetchCategories();
